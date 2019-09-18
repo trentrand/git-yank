@@ -23,6 +23,8 @@
   "homepage": "https://github.com/trentrand/git-yank#readme",
   "dependencies": {
     "core-js": "^3.2.1",
+    "dugite": "^1.87.2",
+    "project-name-generator": "^2.1.7",
     "yargs": "^14.0.0"
   },
   "devDependencies": {
