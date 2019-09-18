@@ -49,7 +49,8 @@ const argv = yargs.usage(
   .help('h')
   .alias('h', 'help')
   .showHelpOnFail(false, 'Specify --help for available options')
-  .epilogue('for more information, find the documentation at https://github.com/trentrand/git-yank')
+  .epilogue('For more information, see the documentation:\nhttps://github.com/trentrand/git-yank\n')
+  .epilogue('Created by Trent Rand <contact@trentrand.com>')
   .argv;
 
 let args = {
