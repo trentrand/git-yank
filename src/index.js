@@ -63,6 +63,11 @@ let args = {
 };
 
 (async () => {
+  if (args.commits.length === 0) {
+    yargs.showHelp();
+    return;
+  }
+
   const sourceBranchName = await getCurrentGitBranchName();
 
   if (args.debug) {
