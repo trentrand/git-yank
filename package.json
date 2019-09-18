@@ -1,0 +1,32 @@
+{
+  "name": "git-yank",
+  "version": "1.0.0",
+  "description": "Move a commit or series of commits to a new branch",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "watch": "babel src -d dist --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trentrand/git-yank.git"
+  },
+  "keywords": [
+    "git"
+  ],
+  "author": "Trent Rand <contact@trentrand.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/trentrand/git-yank/issues"
+  },
+  "homepage": "https://github.com/trentrand/git-yank#readme",
+  "dependencies": {
+    "core-js": "^3.2.1",
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
+    "@babel/preset-env": "^7.6.0"
+  }
+}
