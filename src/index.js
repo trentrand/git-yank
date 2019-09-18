@@ -47,3 +47,19 @@ const argv = yargs.usage(
   .showHelpOnFail(false, 'Specify --help for available options')
   .epilogue('for more information, find the documentation at https://github.com/trentrand/git-yank')
   .argv;
+
+let args = {
+  commits: argv['_'],
+  destinationBranchName: argv['branch'],
+  startPoint: argv['start-point'],
+  push: argv['push'],
+  safe: argv['safe'],
+  debug: argv['debug'],
+};
+
+(async () => {
+  if (args.debug) {
+    console.log(`Source Branch Name: ${sourceBranchName}`);
+    console.log(`Options: ${JSON.stringify(args, null, 2)}`);
+  }
+})();
