@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "watch": "babel src -d dist --watch",
+    "build": "babel src -d dist",
+    "watch": "npm run-script build -- --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

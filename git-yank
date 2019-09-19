@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Move a commit or series of commits to a new branch.
+# $ git-yank [commits] <options>`
+
+# Set the cwd to the script's directory, not the caller's directory
+GIT_YANK_DIR="$(dirname "$0")"
+echo $GIT_YANK_DIR
+
+# Compile the script if this is the first time it's being executed
+if [ ! -d "${GIT_YANK_DIR}/dist" ]
+then
+  (cd $GIT_YANK_DIR && npm run build)
+fi
+
+# Execute the git-yank command with the provided argument vector
+node "${GIT_YANK_DIR}/dist/index.js" $*
