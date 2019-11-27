@@ -69,16 +69,22 @@ let args = {
   }
 
   const sourceBranchName = await getCurrentGitBranchName();
-
+  
+  if (args.destinationBranchName === undefined) {
+    args.destinationBranchName = generateBranchName({ words: 2, alliterative: true }).dashed;
+  }
+  
   if (args.debug) {
     console.log(`Source Branch Name: ${sourceBranchName}`);
     console.log(`Options: ${JSON.stringify(args, null, 2)}`);
   }
 
-  if (args.destinationBranchName === undefined) {
-    args.destinationBranchName = generateBranchName({ words: 2, alliterative: true }).dashed;
+  // Stash any changes in working directory before proceeding with process
+  let hasStashedWorkingTree = false;
+  if (isWorkingTreeDirty()) {
+    hasStashedWorkingTree = await stashWorkingTree();
   }
-
+  
   // Create new branch or checkout existing
   await createBranchIfDoesNotExist(args.destinationBranchName, args.startPoint);
 
@@ -86,7 +92,9 @@ let args = {
   await checkoutBranch(args.destinationBranchName);
 
   // Cherry pick the specified commits
-  await cherryPickCommits(args.commits);
+  for (let commitIdentifier of args.commits) {
+    await cherryPickCommit(commitIdentifier);
+  }
 
   // Conditionally push the destination branch
   if (args.push) {
@@ -101,6 +109,11 @@ let args = {
     for (let commitIdentifier of args.commits) {
       await removeCommitFromBranch(commitIdentifier, sourceBranchName);
     }
+  }
+
+  // Conditionally unstash changes stashed from working directory in beginning of process
+  if (hasStashedWorkingTree) {
+    await unstashWorkingTree();
   }
 
   console.log(`Successfully yanked the specified commits to a branch named ${args.destinationBranchName}.`);
@@ -124,6 +137,38 @@ async function createBranchIfDoesNotExist(branchName, startPoint) {
   }
 }
 
+async function isWorkingTreeDirty() {
+  const command = 'diff --quiet'.split(' ');
+  const { exitCode } = await GitProcess.exec(command, pathToRepository);
+  
+  // Diff exit codes: https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---exit-code
+  return exitCode === 1;
+}
+
+async function stashWorkingTree() {
+  const { stdout, stderr, exitCode } = await GitProcess.exec(['stash'], pathToRepository);
+  
+  if (exitCode !== 0) {
+    Logger.error(stderr, exitCode);
+    return false;
+  }
+
+  console.info('Stashing changes in current working tree. Stashed changes will be automatically unstashed.');
+  
+  return true;
+}
+
+async function unstashWorkingTree() {
+  const command = 'stash --pop'.split(' ');
+  const { stderr, exitCode } = await GitProcess.exec(command, pathToRepository);
+
+  if (exitCode !== 0) {
+    Logger.error(stderr, exitCode);
+  }
+
+  console.info('Unstashed changes to current working tree.');
+}
+
 async function checkoutBranch(branchName) {
   const command = `checkout ${branchName}`.split(' ');
   const { stdout, stderr, exitCode } = await GitProcess.exec(command, pathToRepository);
@@ -133,11 +178,15 @@ async function checkoutBranch(branchName) {
   }
 }
 
-async function cherryPickCommits(commits) {
-  const commitsList = commits.join(' ');
-  const { stdout, stderr, exitCode } = await GitProcess.exec(['cherry-pick', commitsList], pathToRepository);
+async function cherryPickCommit(commitIdentifier) {
+  const command = `cherry-pick ${commitIdentifier}`.split(' ');
+  const { stdout, stderr, exitCode } = await GitProcess.exec(command, pathToRepository);
 
   if (exitCode !== 0) {
+    const parsedError = GitProcess.parseError(stderr);
+    if (parsedError) {
+      console.log(parsedError);
+    }
     Logger.error(stderr, exitCode);
   }
 }
@@ -148,6 +197,8 @@ async function pushCurrentBranch() {
   if (exitCode !== 0) {
     Logger.error(stderr, exitCode);
   }
+
+ console.log(stdout); 
 }
 
 async function getCurrentGitBranchName() {
