@@ -38,8 +38,7 @@ git yank <commit-sha> --branch name-of-new-or-existing-branch --push
 
 1. `git-yank <sha1> <sha2> <sha3>` <br>Moves the three specified commits to a new destination branch.
   
-2. `git-yank <sha> -b hotfix` <br>Moves the specified commit to the destination branch "hotfix", creating it if it doesn't exist.
+2. `git-yank <sha> --branch hotfix --push` <br>Moves the specified commit to the destination branch "hotfix" ,creating it if it doesn't exist, and push changes to remote repository.
 
 3. `git-yank <sha> --branch feature/patch --start-point feature` <br>Moves the specified commit to the destination branch "feature/patch", creating <br> it if it doesn't exist using the "feature" branch as the branch start point.
-
 
